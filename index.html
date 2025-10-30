@@ -1,109 +1,241 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login - T Prime</title>
-  <link rel="stylesheet" href="login.css" />
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gelapkan Background</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link href="awal.css" rel="stylesheet">
+  <script defer src="awal.js"></script>
 </head>
-<body>
-  <div class="login-container">
-    <div class="title-container">
-      <img src="image/Twatch[1].png" alt="Logo T Prime" class="logo" />
-      <h1 class="title-text">T Prime</h1>
+
+<body class="bg-gray-900 text-white">
+
+  <!-- Navbar -->
+  <div class="navbar flex justify-between items-center p-4 bg-black shadow-lg">
+    <div class="navbar-left flex items-center gap-4">
+      <img src="image/Twatch[1].png" alt="Logo" class="logo w-14">
+      <i class="fas fa-arrow-left back-icon cursor-pointer text-xl hover:text-gray-400"></i>
+      <input type="text" id="searchInput" placeholder="Search movies..." class="search-input px-4 py-2 rounded-md bg-gray-800 text-white border border-gray-600 focus:outline-none focus:border-white">
     </div>
-
-    <form id="login-form" method="POST" action="login.php" autocomplete="off">
-      <input type="text" name="username" id="login-username" placeholder="Username" required />
-      <input type="password" name="password" placeholder="Password" required />
-      <button type="submit">Login</button>
-    </form>
-
-    <div style="margin-top:10px;">
-      <span>Don't have an account? <a href="#" id="show-register">Register here</a></span>
+    <div class="navbar-right flex items-center gap-4">
+      <i class="fas fa-user user-icon text-xl"></i>
+      <button id="themeToggle" class="p-2 rounded-md bg-gray-700 text-white">🌙</button>
+      <a href="login.html" class="sign-in text-white font-semibold hover:text-gray-400">Sign In</a>
     </div>
-
-    <form id="register-form" method="POST" action="register.php" autocomplete="off" style="display:none; margin-top:20px;">
-      <input type="text" name="username" id="register-username" placeholder="Username" required />
-      <input type="password" name="password" placeholder="Password" required />
-      <button type="submit">Register</button>
-      <div style="margin-top:10px;">
-        <a href="#" id="hide-register">Back to Login</a>
-      </div>
-    </form>
-
-    <div id="google-btn-container" class="google-button-container"></div>
-    <p id="message"></p>
   </div>
 
   <script>
-    window.onload = function() {
-      google.accounts.id.initialize({
-        client_id: 'YOUR_GOOGLE_CLIENT_ID', // Ganti dengan client ID dari Google Console
-        callback: handleCredentialResponse,
-        auto_select: false,
-        cancel_on_tap_outside: false,
-        prompt_parent_id: 'google-btn-container'
-      });
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
 
-      google.accounts.id.renderButton(
-        document.getElementById('google-btn-container'),
-        {
-          theme: 'outline',
-          size: 'large',
-          logo_alignment: 'left',
-          text: 'signin_with'
-        }
-      );
+    function setTheme(theme) {
+      if (theme === 'light') {
+        body.classList.remove('dark');
+        themeToggle.textContent = '🌞';
+      } else {
+        body.classList.add('dark');
+        themeToggle.textContent = '🌙';
+      }
+      localStorage.setItem('theme', theme);
+    }
 
-      // Toggle register form
-      document.getElementById('show-register').onclick = function(e) {
-        e.preventDefault();
-        document.getElementById('login-form').style.display = 'none';
-        document.getElementById('register-form').style.display = 'block';
-      };
-      document.getElementById('hide-register').onclick = function(e) {
-        e.preventDefault();
-        document.getElementById('register-form').style.display = 'none';
-        document.getElementById('login-form').style.display = 'block';
-      };
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = body.classList.contains('dark') ? 'light' : 'dark';
+      setTheme(currentTheme);
+    });
 
-      // AJAX register
-      document.getElementById('register-form').onsubmit = function(e) {
-        e.preventDefault();
-        var form = e.target;
-        var formData = new FormData(form);
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', 'register.php', true);
-        xhr.onload = function() {
-          var response = xhr.responseText;
-          var username = document.getElementById('register-username').value;
-          document.getElementById('register-form').style.display = 'none';
-          document.getElementById('login-form').style.display = 'block';
-          document.getElementById('login-username').value = username;
-          document.getElementById('message').innerText = response;
-        };
-        xhr.send(formData);
-      };
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      setTheme(savedTheme);
+    });
+  </script>
+
+<!-- GANTI BAGIAN MOVIE BANNER INI -->
+<!-- Movie Banner / Slideshow -->
+<div class="movie-banner relative w-full h-screen overflow-hidden">
+  <img id="slideshow" src="image/JS.jpg" class="w-full h-full object-cover transition-opacity duration-1000 ease-in-out" alt="Banner Slide">
+  <div class="absolute inset-0 bg-black bg-opacity-30 pointer-events-none"></div>
+</div>
+
+<script>
+  const images = [
+    "image/JS.jpg",
+    "image/CA.jpg",
+    "image/MI.png",
+    "image/TM.png",
+    "image/TH.png"
+  ];
+
+  let currentIndex = 0;
+  const slideshow = document.getElementById("slideshow");
+
+  function showNextImage() {
+    currentIndex = (currentIndex + 1) % images.length;
+    slideshow.classList.remove('opacity-100');
+    slideshow.classList.add('opacity-0');
+
+    setTimeout(() => {
+      slideshow.src = images[currentIndex];
+      slideshow.classList.remove('opacity-0');
+      slideshow.classList.add('opacity-100');
+    }, 500);
+  }
+
+  setInterval(showNextImage, 5000); // Ganti gambar setiap 5 detik
+</script>
+
+
+<style>
+  #slideshow {
+    transition: opacity 0.5s ease-in-out;
+  }
+</style>
+
+
+  <!-- Filter & Sort -->
+  <div class="p-4 flex flex-col md:flex-row justify-between gap-4">
+    <select id="genreFilter" class="p-2 bg-gray-800 text-white rounded-md">
+      <option value="all">Semua Genre</option>
+      <option value="action">Action</option>
+      <option value="comedy">Romance</option>
+      <option value="horror">Horror</option>
+    </select>
+    <select id="sortMovies" class="p-2 bg-gray-800 text-white rounded-md">
+      <option value="asc">A - Z</option>
+      <option value="desc">Z - A</option>
+    </select>
+  </div>
+
+  <!-- Container Kategori Film -->
+  <div class="container mx-auto p-4" id="movieContainer"></div>
+
+  <!-- Modal Video -->
+  <div id="videoModal" class="fixed inset-0 bg-black bg-opacity-90 flex justify-center items-center z-50 hidden">
+    <div class="bg-gray-900 text-white p-6 rounded-lg max-w-4xl w-full relative">
+      <button onclick="closeModal()" class="absolute top-2 right-4 text-white text-2xl">&times;</button>
+      <h3 id="modalTitle" class="text-2xl font-bold mb-2"></h3>
+      <p id="modalDescription" class="mb-4 text-sm text-gray-300"></p>
+      <video id="modalVideo" class="w-full rounded mb-4" controls autoplay>
+        <source src="" type="video/mp4">
+      </video>
+      <button onclick="closeModal()" class="bg-yellow-500 hover:bg-yellow-600 text-black px-4 py-2 rounded">Kembali</button>
+    </div>
+  </div>
+
+  <!-- Script Film -->
+  <script>
+    const movieCategories = {
+      topMovies: [
+        { img: "image/joker.jpg", title: "Joker: Folie à Deux", genre: "Drama", year: 2024, video: "video/Joker_ Folie À Deux _ Official Trailer.mp4", description: "Lanjutan kisah Arthur Fleck dalam nuansa musikal gelap." },
+        { img: "image/Gladiator.jpg", title: "Gladiator II", genre: "Action", year: 2024, video: "video/Gladiator II Trailer 2.mp4", description: "Sekuel epik dari kisah pertempuran Romawi." },
+        { img: "image/beekeeper.jpg", title: "The Beekeeper", genre: "Action", year: 2024, video: "video/THE BEEKEEPER _ Official Restricted Trailer.mp4", description: "Agen rahasia memburu kebenaran di balik kematian sahabatnya." },
+        { img: "image/fall.jpg", title: "The Fall Guy", genre: "Action", year: 2024, video: "video/The Fall Guy _ Official Trailer.mp4", description: "Stuntman yang terjebak dalam konspirasi nyata." },
+        { img: "image/tranformers.jpg", title: "Transformers", genre: "Action", year: 2023, video: "video/Transformers One - Official Trailer _ 2024 _ Hasbro Pulse.mp4", description: "Pertempuran Autobots vs Decepticons terbaru." }
+      ],
+      actionMovies: [
+        { img: "image/fast.jpg", title: "Fast & Furious: Hobbs & Shaw", genre: "Action", year: 2019, video: "video/Fast & Furious Presents_ Hobbs & Shaw - Official Trailer #2 [HD].mp4", description: "Duo tangguh menghadapi ancaman global." },
+        { img: "image/john.jpg", title: "John Wick", genre: "Action", year: 2014, video: "video/John Wick – Trailer - Official Warner Bros. UK.mp4", description: "Pembunuh bayaran legendaris kembali beraksi." },
+        { img: "image/Uncharted.jpg", title: "Uncharted", genre: "Action", year: 2022, video: "video/UNCHARTED - Official Trailer (HD).mp4", description: "Pemburu harta karun dalam petualangan global." },
+        { img: "image/batman.jpg", title: "The Batman", genre: "Action", year: 2022, video: "video/THE BATMAN – Main Trailer.mp4", description: "Bruce Wayne menghadapi Riddler dalam Gotham gelap." },
+        { img: "image/tenet.jpg", title: "Tenet", genre: "Action", year: 2020, video: "video/TENET - NEW TRAILER.mp4", description: "Agen rahasia menembus waktu untuk mencegah perang dunia." }
+      ],
+      comedyMovies: [
+        { img: "image/union.png", title: "Union", genre: "Comedy", year: 2019, video: "video/The Union _ Mark Wahlberg + Halle Berry _ Official Trailer _ Netflix.mp4", description: "Kisah kocak tentang persatuan dan kekacauan." },
+        { img: "image/dumb.png", title: "Dumb and Dumber", genre: "Comedy", year: 1994, video: "video/Dumb & Dumber (1994) Official Trailer - Jim Carrey, Jeff Daniels Comedy HD.mp4", description: "Petualangan konyol dua sahabat bodoh." },
+        { img: "image/white.png", title: "White Chicks", genre: "Comedy", year: 2004, video: "video/White Chicks (2004) Official Trailer 1 - Marlon Wayans Movie.mp4", description: "Dua agen FBI menyamar jadi sosialita kulit putih." },
+        { img: "image/dictator.png", title: "The Dictator", genre: "Comedy", year: 2012, video: "video/The Dictator - Latest Trailer.mp4", description: "Tirani lucu dari negara fiksi Wadiya." },
+        { img: "image/bad.png", title: "Bad Boys", genre: "Comedy", year: 1995, video: "video/BAD TRIP Trailer (2020) Eric Andre Comedy Movie.mp4", description: "Dua polisi Miami dalam aksi seru dan humoris." }
+      ],
+      romanceMovies: [
+        { img: "image/korea.jpg", title: "Tune in for Love", genre: "Romance", year: 2019, video: "video/“Tune In For Love” Teaser.mp4", description: "Cinta dan takdir bertemu lewat radio." },
+        { img: "image/you.jpg", title: "The Idea of You", genre: "Romance", year: 2023, video: "video/THE IDEA OF YOU Trailer (2024) Anne Hathaway, Romance Movie.mp4", description: "Kisah cinta mengejutkan antara ibu tunggal dan idol muda." },
+        { img: "image/oh.jpg", title: "Eternal Sunshine of the Spotless Mind", genre: "Romance", year: 2004, video: "video/THE IDEA OF YOU Trailer (2024) Anne Hathaway, Romance Movie.mp4", description: "Pasangan yang mencoba melupakan kenangan cinta mereka." },
+        { img: "image/me before.jpg", title: "Me Before You", genre: "Romance", year: 2016, video: "video/Me Before You Official Trailer.mp4", description: "Wanita ceria yang mengubah hidup pria lumpuh." },
+        { img: "image/wedding.jpg", title: "On Your Wedding Day", genre: "Romance", year: 2018, video: "video/[너의 결혼식] _ [On Your Wedding Day] Trailer (2018).mp4", description: "Cinta pertama yang tak mudah dilupakan." }
+      ],
+      horrorMovies: [
+        { img: "image/woaw.jpg", title: "The Conjuring", genre: "Horror", year: 2013, video: "video/The Conjuring - Official Main Trailer [HD].mp4", description: "Kisah nyata pemburu hantu terkenal." },
+        { img: "image/it.jpg", title: "IT", genre: "Horror", year: 2017, video: "video/IT - Official Trailer 1.mp4", description: "Badut menakutkan meneror kota kecil." },
+        { img: "image/28.jpg", title: "28 Days Later", genre: "Horror", year: 2002, video: "video/28 DAYS LATER – Official Trailer.mp4", description: "Virus mematikan mengubah manusia jadi monster." },
+        { img: "image/anabel.jpg", title: "Anabel", genre: "Horror", year: 2014, video: "video/Annabelle - Official Main Trailer [HD].mp4", description: "Boneka terkutuk yang menghantui keluarga muda." },
+        { img: "image/witch.jpg", title: "The Witch", genre: "Horror", year: 2015, video: "video/THE WITCH_ SUBVERSION Official US Trailer _ Korean Drama Sci-fi Action Thriller .mp4", description: "Teror iblis di hutan terpencil abad ke-17." }
+      ]
     };
 
-    function handleCredentialResponse(response) {
-      fetch('google_login.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ credential: response.credential })
-      })
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById('message').innerText = data.message;
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        document.getElementById('message').innerText = "Login failed. Please try again.";
+    function renderMovies(category, elementId) {
+      const filter = document.getElementById("genreFilter").value;
+      const sort = document.getElementById("sortMovies").value;
+      let movies = movieCategories[category];
+
+      if (filter !== "all") {
+        movies = movies.filter(m => m.genre.toLowerCase() === filter);
+      }
+
+      movies.sort((a, b) => {
+        return sort === "asc"
+          ? a.title.localeCompare(b.title)
+          : b.title.localeCompare(a.title);
+      });
+
+      document.getElementById(elementId).innerHTML = movies.map(movie => `
+        <div class="movie-poster relative group">
+          <img src="${movie.img}" class="rounded-lg shadow-lg" alt="${movie.title}">
+          <div class="absolute inset-0 bg-black bg-opacity-60 flex flex-col justify-center items-center opacity-0 group-hover:opacity-100 transition duration-300">
+            <p class="text-white text-lg font-bold">${movie.title}</p>
+            <button onclick="playVideo('${movie.video}', '${movie.title}', \`${movie.description}\`)" class="bg-red-600 px-4 py-2 rounded mt-2 text-white">Tonton</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderAllCategories() {
+      const container = document.getElementById("movieContainer");
+      container.innerHTML = "";
+
+      const sections = {
+        topMovies: "Top Movies 2024",
+        actionMovies: "Best Action Movies",
+        comedyMovies: "Best Comedy Movies",
+        romanceMovies: "Best Romance Movies",
+        horrorMovies: "Best Horror Movies"
+      };
+
+      Object.entries(sections).forEach(([key, title]) => {
+        container.innerHTML += `
+          <div class="category mb-10">
+            <h2 class="text-3xl font-bold mb-6 border-l-4 border-yellow-500 pl-4">${title}</h2>
+            <div id="${key}" class="movie-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6"></div>
+          </div>
+        `;
+        renderMovies(key, key);
       });
     }
-  </script>
-</body>
-</html>
 
+    function playVideo(videoSrc, title, description) {
+      document.getElementById("modalTitle").textContent = title;
+      document.getElementById("modalDescription").textContent = description;
+      document.getElementById("modalVideo").src = videoSrc;
+      document.getElementById("videoModal").classList.remove("hidden");
+    }
+
+    function closeModal() {
+      const modal = document.getElementById("videoModal");
+      const video = document.getElementById("modalVideo");
+      modal.classList.add("hidden");
+      video.pause();
+      video.currentTime = 0;
+    }
+
+    document.getElementById("genreFilter").addEventListener("change", renderAllCategories);
+    document.getElementById("sortMovies").addEventListener("change", renderAllCategories);
+
+    // Inisialisasi
+    renderAllCategories();
+  </script>
+
+</body>
+
+</html>
