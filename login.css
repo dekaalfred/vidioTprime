@@ -1,0 +1,97 @@
+/* Reset dan dasar */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background: url(image/WhatsApp\ Image\ 2025-04-27\ at\ 19.14.04_5a9ac280.jpg) no-repeat center center fixed;
+    background-size: cover;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* Kotak login */
+  .login-container {
+    background: rgba(0, 0, 0, 0.85);
+    padding: 32px 24px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 350px;
+    color: #fff;
+    text-align: center;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+    margin: 60px auto;
+  }
+  
+  /* Title (logo dan teks) */
+  .title-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .logo {
+    height: 40px;
+    margin-right: 10px;
+  }
+  
+  .title-text {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
+  }
+  
+  /* Input */
+  input {
+    width: 100%;
+    padding: 12px;
+    margin: 12px 0;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+  
+  /* Tombol umum */
+  button {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    font-size: 15px;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  /* Tombol login biasa */
+  #login-form button {
+    background-color: #e50914;
+    color: white;
+  }
+  
+  #login-form button:hover {
+    background-color: #f6121d;
+  }
+  
+  /* Google button container */
+  .google-button-container {
+    margin-top: 20px;
+  }
+  
+  /* Pesan status */
+  #message {
+    margin-top: 15px;
+    font-size: 14px;
+    color: lightgreen;
+  }
+
+  .login-form {
+    background: rgba(255,255,255,0.8);
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 400px;
+    margin: 100px auto;
+  }
